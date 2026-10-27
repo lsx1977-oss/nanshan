@@ -1,0 +1,163 @@
+---
+import Base from '../layouts/Base.astro';
+import StoreButtons from '../components/StoreButtons.astro';
+import { SITE } from '../site.config.mjs';
+
+const faq = [
+  { q: '南山 App 免費嗎？', a: '免費下載，核心的交友、聊天與動態功能都能免費使用。' },
+  { q: '使用南山，我的隱私安全嗎？', a: '南山不以位置配對，發文也不會顯示你的位置；加上封鎖與檢舉功能，你可以安心分享生活。' },
+  { q: '南山只有台北的用戶嗎？', a: '全台各地都有用戶。南山支援多語言，繁體中文用戶開啟就是繁中介面，也歡迎來台灣旅遊的朋友使用。' },
+  { q: '還沒出櫃也能用南山嗎？', a: '可以。南山不會公開你的位置，要分享哪些內容由你決定，不放可辨識身分的照片也能自在交朋友。' },
+];
+
+const siteUrl = new URL('/', Astro.site).href;
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'WebSite',
+      '@id': `${siteUrl}#website`,
+      url: siteUrl,
+      name: SITE.name,
+      alternateName: ['南山', '南山 同志交友'],
+      inLanguage: 'zh-TW',
+    },
+    {
+      '@type': 'MobileApplication',
+      '@id': `${siteUrl}#app`,
+      name: '南山',
+      alternateName: '南山 App',
+      description: '台灣男同志的交友與生活社群：看動態、刷影片、私訊聊天交朋友。',
+      applicationCategory: 'SocialNetworkingApplication',
+      operatingSystem: 'iOS, Android',
+      inLanguage: 'zh-TW',
+      offers: { '@type': 'Offer', price: '0', priceCurrency: 'TWD' },
+      downloadUrl: [SITE.appStoreUrl, SITE.playUrl],
+    },
+    {
+      '@type': 'FAQPage',
+      mainEntity: faq.map((f) => ({
+        '@type': 'Question', name: f.q,
+        acceptedAnswer: { '@type': 'Answer', text: f.a },
+      })),
+    },
+  ],
+};
+---
+<Base
+  title="南山 App｜台灣同志交友 App・看動態認識真正的他"
+  ogTitle="南山 App｜台灣同志交友 App，認識真正聊得來的他"
+  description="台灣男同志的交友與生活社群。看動態、刷影片、私訊聊天交朋友，免費下載南山，在安全友善的空間做自己。"
+  jsonLd={jsonLd}
+  rainbow={false}
+>
+  <main class="home">
+    <section class="hero" style="padding-bottom:0">
+      <div class="wrap hero-grid">
+        <div>
+          <span class="eyebrow">台灣男同志的交友與生活社群</span>
+          <h1><span class="brand">南山 App</span>台灣同志交友 App，認識真正聊得來的他</h1>
+          <p class="lead">不只是配對。在南山分享生活、看影片，從聊得來的話題開始認識他。</p>
+          <StoreButtons icons light />
+          <p class="note">免費下載・iOS 與 Android 皆可使用</p>
+        </div>
+
+        <!-- TODO：換成真實截圖（建議繁中版、官方帳號貼文），例如：
+        <img src="/img/nanshan-feed.webp" width="560" height="1150" alt="南山 App 動態頁面截圖" fetchpriority="high">
+        -->
+        <div class="phone" role="img" aria-label="南山 App 動態頁面示意">
+          <div class="screen">
+            <div class="top"></div>
+            <div class="post">
+              <div class="who"><span class="av" style="background:#f2b84b"></span><span class="bar" style="width:45%"></span></div>
+              <span class="bar" style="width:90%;display:block"></span>
+              <div class="pic" style="background:linear-gradient(135deg,#4ea3b8,#d8e5f6)"></div>
+            </div>
+            <div class="post">
+              <div class="who"><span class="av" style="background:#7b78c9"></span><span class="bar" style="width:38%"></span></div>
+              <span class="bar" style="width:75%;display:block;margin-bottom:6px"></span>
+              <span class="bar" style="width:55%;display:block"></span>
+            </div>
+            <div class="post">
+              <div class="who"><span class="av" style="background:#3b7cf5"></span><span class="bar" style="width:50%"></span></div>
+              <div class="pic" style="background:linear-gradient(135deg,#f2b84b,#e8704a)"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <svg class="ridge" viewBox="0 0 1440 140" preserveAspectRatio="none" aria-hidden="true">
+        <path d="M0 140 L0 80 L180 30 L320 75 L520 10 L700 70 L860 35 L1040 90 L1220 40 L1440 85 L1440 140Z" fill="#22466e"/>
+        <path d="M0 140 L0 110 L240 70 L420 105 L640 60 L860 110 L1080 75 L1300 112 L1440 95 L1440 140Z" fill="#f7f3ec"/>
+      </svg>
+    </section>
+    <div class="rainbow" aria-hidden="true"></div>
+
+    <section>
+      <div class="wrap">
+        <h2>為什麼選擇南山？</h2>
+        <p class="sub">我們相信，認識一個人應該從了解他的生活開始，而不只是一張照片。</p>
+        <div class="features">
+          <article class="feature">
+            <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="3"/><path d="M3 15l5-5 4 4 3-3 6 6"/></svg></div>
+            <h3>不只看照片，也看見生活</h3>
+            <p>瀑布流動態裡有他的穿搭、旅行和日常，喜歡就按讚留言、私訊聊聊。</p>
+          </article>
+          <article class="feature">
+            <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="3"/><path d="M10 9.5v5l4.5-2.5z"/></svg></div>
+            <h3>影片，看見更立體的他</h3>
+            <p>刷短影音，看看他的健身日常、旅行和生活，比一張照片更真實。</p>
+          </article>
+          <article class="feature">
+            <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10h18M8 3v4M16 3v4"/></svg></div>
+            <h3>圈內活動第一手</h3>
+            <p>遊行路線、派對購票、在地活動，官方帳號即時整理，不怕錯過。</p>
+          </article>
+          <article class="feature">
+            <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l8 3v6c0 4.5-3.4 8-8 9-4.6-1-8-4.5-8-9V6l8-3z"/><path d="M8.5 12l2.5 2.5 4.5-5"/></svg></div>
+            <h3>安全，是基本</h3>
+            <p>不以位置配對，發文不會顯示你的位置，加上一鍵檢舉封鎖，安心做自己。</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section style="padding-top:0">
+      <div class="wrap">
+        <div class="compare-box">
+          <div>
+            <h2>南山和其他 G軟有什麼不同？</h2>
+            <p>很多交友軟體只有照片和距離。南山把重點放在內容上，先認識一個人，再決定要不要更靠近。</p>
+            <a class="link-arrow" href="/compare/">看完整 G軟比較 →</a>
+          </div>
+          <div class="vs" aria-label="南山特色比較">
+            <div><span>認識方式</span><b>動態 + 影片 + 私訊</b></div>
+            <div><span>圈內資訊</span><b>遊行、派對第一手</b></div>
+            <div><span>位置隱私</span><b>發文不顯示位置</b></div>
+            <div><span>費用</span><b>免費下載</b></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section style="padding-top:0">
+      <div class="wrap narrow">
+        <h2>常見問題</h2>
+        <p class="sub">關於南山 App，你可能想知道的事。</p>
+        {faq.map((f, i) => (
+          <details open={i === 0}>
+            <summary>{f.q}</summary>
+            <p>{f.a}</p>
+          </details>
+        ))}
+      </div>
+    </section>
+
+    <section class="final">
+      <div class="wrap">
+        <h2>做自己，從南山開始</h2>
+        <p class="sub" style="margin:0 auto">現在下載南山，認識和你一樣的人。</p>
+        <StoreButtons />
+      </div>
+    </section>
+  </main>
+</Base>

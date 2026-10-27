@@ -1,0 +1,20 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../layouts/Base.astro';
+import { SITE } from '../site.config.mjs';
+
+const posts = (await getCollection('posts', (p) => !p.data.draft))
+  .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
+  .slice(0, 5);
+---
+<Base title={`找不到頁面 - ${SITE.name}`} description="找不到這個頁面。" noindex>
+  <main class="wrap narrow article" style="min-height:50vh">
+    <h1 style="margin-top:40px">找不到這個頁面</h1>
+    <p>這個頁面可能已經移動或不存在。你可以回到 <a href="/">首頁</a>，或看看這些內容：</p>
+    <ul class="post-list">
+      {posts.map((p) => (
+        <li><a href={`/${p.data.category}/${p.id}/`}>{p.data.title}</a></li>
+      ))}
+    </ul>
+  </main>
+</Base>

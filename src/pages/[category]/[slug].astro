@@ -1,0 +1,167 @@
+---
+import { getCollection, render } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import StoreButtons from '../../components/StoreButtons.astro';
+import { SITE, CATEGORIES } from '../../site.config.mjs';
+
+export async function getStaticPaths() {
+  const posts = await getCollection('posts', (p) => !p.data.draft);
+  return posts.map((post) => ({
+    params: { category: post.data.category, slug: post.id },
+    props: { post, all: posts },
+  }));
+}
+
+const { post, all } = Astro.props;
+const d = post.data;
+const cat = CATEGORIES[d.category];
+const { Content, headings } = await render(post);
+
+const url = new URL(Astro.url.pathname, Astro.site).href;
+const siteUrl = new URL('/', Astro.site).href;
+const ogImage = d.ogImage ?? SITE.defaultOgImage;
+const updated = d.updatedDate ?? d.pubDate;
+const fmt = (dt: Date) => `${dt.getFullYear()} 年 ${dt.getMonth() + 1} 月 ${dt.getDate()} 日`;
+const iso = (dt: Date) => dt.toISOString().slice(0, 10);
+const toc = headings.filter((h) => h.depth === 2);
+
+// 延伸閱讀：同分類優先，其次其他分類，最多 3 篇
+const others = all
+  .filter((p) => p.id !== post.id)
+  .sort((a, b) => {
+    const sa = a.data.category === d.category ? 0 : 1;
+    const sb = b.data.category === d.category ? 0 : 1;
+    return sa - sb || b.data.pubDate.valueOf() - a.data.pubDate.valueOf();
+  })
+  .slice(0, 3);
+
+const graph: object[] = [
+  {
+    '@type': 'Article',
+    headline: d.title,
+    description: d.description,
+    inLanguage: 'zh-TW',
+    datePublished: iso(d.pubDate),
+    dateModified: iso(updated),
+    author: { '@type': 'Organization', name: '南山團隊', url: siteUrl },
+    publisher: { '@type': 'Organization', name: SITE.name, url: siteUrl },
+    mainEntityOfPage: url,
+    image: new URL(ogImage, Astro.site).href,
+  },
+  {
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: '首頁', item: siteUrl },
+      { '@type': 'ListItem', position: 2, name: cat.name, item: new URL(`/${d.category}/`, Astro.site).href },
+      { '@type': 'ListItem', position: 3, name: d.title, item: url },
+    ],
+  },
+];
+if (d.faq.length) {
+  graph.push({
+    '@type': 'FAQPage',
+    mainEntity: d.faq.map((f) => ({
+      '@type': 'Question', name: f.q,
+      acceptedAnswer: { '@type': 'Answer', text: f.a },
+    })),
+  });
+}
+if (d.event) {
+  const e = d.event;
+  graph.push({
+    '@type': 'Event',
+    name: e.name,
+    description: e.description,
+    startDate: e.startDate,
+    endDate: e.endDate,
+    eventStatus: 'https://schema.org/EventScheduled',
+    eventAttendanceMode: 'https://schema.org/OfflineEventAttendanceMode',
+    isAccessibleForFree: e.free,
+    location: {
+      '@type': 'Place',
+      name: e.locationName,
+      address: {
+        '@type': 'PostalAddress',
+        streetAddress: e.streetAddress,
+        addressLocality: e.locality,
+        addressRegion: e.region,
+        addressCountry: 'TW',
+      },
+    },
+    organizer: { '@type': 'Organization', name: e.organizerName, url: e.organizerUrl },
+    image: new URL(ogImage, Astro.site).href,
+  });
+}
+const jsonLd = { '@context': 'https://schema.org', '@graph': graph };
+const cta = d.cta ?? { title: '想找聊得來的人？試試南山', text: '看動態、刷影片，從聊得來的話題開始認識他。免費下載。' };
+---
+<Base
+  title={d.seoTitle ?? d.title}
+  ogTitle={d.title}
+  description={d.description}
+  ogType="article"
+  ogImage={ogImage}
+  jsonLd={jsonLd}
+>
+  <meta slot="head" property="article:published_time" content={iso(d.pubDate)} />
+  <meta slot="head" property="article:modified_time" content={iso(updated)} />
+
+  <main class="wrap narrow article">
+    <nav class="crumbs" aria-label="麵包屑">
+      <a href="/">首頁</a> › <a href={`/${d.category}/`}>{cat.name}</a> › {d.title}
+    </nav>
+    <article>
+      <h1>{d.title}</h1>
+      <p class="meta">
+        南山團隊・更新於 <time datetime={iso(updated)}>{fmt(updated)}</time>
+        {d.readingTime && <>・閱讀約 {d.readingTime}</>}
+      </p>
+      {d.disclose && <p class="disclose">{d.disclose}</p>}
+
+      {d.toc && toc.length > 2 && (
+        <div class="toc">
+          <b>本文目錄</b>
+          <ol>{toc.map((h) => <li><a href={`#${h.slug}`}>{h.text}</a></li>)}</ol>
+        </div>
+      )}
+
+      <div class="prose">
+        <Content />
+      </div>
+
+      {d.faq.length > 0 && (
+        <section class="prose">
+          <h2 id="faq">常見問題</h2>
+          {d.faq.map((f, i) => (
+            <details open={i === 0}>
+              <summary>{f.q}</summary>
+              <p>{f.a}</p>
+            </details>
+          ))}
+        </section>
+      )}
+
+      <div class="endcta">
+        <h2>{cta.title}</h2>
+        <p>{cta.text}</p>
+        <StoreButtons light />
+      </div>
+
+      {d.sources.length > 0 && (
+        <p class="src">
+          資料來源：
+          {d.sources.map((s, i) => <>{i > 0 && '、'}<a href={s.url} rel="noopener">{s.title}</a></>)}
+        </p>
+      )}
+
+      {others.length > 0 && (
+        <aside class="related">
+          <h2>延伸閱讀</h2>
+          <ul>
+            {others.map((p) => <li><a href={`/${p.data.category}/${p.id}/`}>{p.data.title}</a></li>)}
+          </ul>
+        </aside>
+      )}
+    </article>
+  </main>
+</Base>

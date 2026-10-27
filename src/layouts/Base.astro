@@ -1,0 +1,79 @@
+---
+import '../styles/global.css';
+import { SITE, CATEGORIES } from '../site.config.mjs';
+
+interface Props {
+  title: string;            // <title>
+  description: string;
+  ogTitle?: string;
+  ogType?: 'website' | 'article';
+  ogImage?: string;
+  noindex?: boolean;
+  jsonLd?: object;
+  rainbow?: boolean;
+}
+const {
+  title, description, ogTitle, ogType = 'website',
+  ogImage = SITE.defaultOgImage, noindex = false, jsonLd, rainbow = true,
+} = Astro.props;
+
+const canonical = new URL(Astro.url.pathname, Astro.site).href;
+const ogImageUrl = new URL(ogImage, Astro.site).href;
+const year = new Date().getFullYear();
+---
+<!doctype html>
+<html lang="zh-Hant-TW">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>{title}</title>
+  <meta name="description" content={description} />
+  {!noindex && <link rel="canonical" href={canonical} />}
+  {!noindex && <link rel="alternate" hreflang="zh-TW" href={canonical} />}
+  <meta name="robots" content={noindex ? 'noindex, follow' : 'index, follow, max-image-preview:large'} />
+  <meta name="theme-color" content="#17324f" />
+  <meta name="apple-itunes-app" content={`app-id=${SITE.appStoreId}`} />
+
+  <meta property="og:type" content={ogType} />
+  <meta property="og:locale" content="zh_TW" />
+  <meta property="og:site_name" content={SITE.name} />
+  <meta property="og:title" content={ogTitle ?? title} />
+  <meta property="og:description" content={description} />
+  <meta property="og:url" content={canonical} />
+  <meta property="og:image" content={ogImageUrl} />
+  <meta name="twitter:card" content="summary_large_image" />
+
+  <link rel="icon" href="/favicon.ico" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  <link rel="sitemap" href="/sitemap-index.xml" />
+  <slot name="head" />
+  {jsonLd && <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />}
+</head>
+<body>
+  <header class="nav">
+    <div class="wrap">
+      <a class="logo" href="/" aria-label={`${SITE.name} 首頁`}>
+        <!-- TODO：可換成正式 Logo：<img src="/img/logo.svg" alt="南山" width="120" height="32"> -->
+        <svg viewBox="0 0 32 32" aria-hidden="true"><circle cx="22" cy="10" r="5" fill="#3b7cf5"/><path d="M2 28 L12 12 L18 21 L22 16 L30 28Z" fill="#d8e5f6"/></svg>
+        南山
+      </a>
+      <nav class="nav-links" aria-label="主要導覽">
+        {Object.entries(CATEGORIES).map(([key, c]) => <a href={`/${key}/`}>{c.name}</a>)}
+      </nav>
+    </div>
+  </header>
+  {rainbow && <div class="rainbow" aria-hidden="true"></div>}
+
+  <slot />
+
+  <footer>
+    <div class="wrap">
+      <span>© {year} {SITE.name}</span>
+      <nav aria-label="頁尾導覽">
+        {Object.entries(CATEGORIES).map(([key, c]) => <a href={`/${key}/`}>{c.name}</a>)}
+        {SITE.privacyUrl && <a href={SITE.privacyUrl}>隱私權政策</a>}
+      </nav>
+    </div>
+  </footer>
+</body>
+</html>
