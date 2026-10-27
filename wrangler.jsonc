@@ -1,0 +1,13 @@
+// Cloudflare Workers 部署設定（靜態網站）
+// 正式部署（wrangler deploy）與 PR 預覽（wrangler preview）都會讀取這個檔案
+{
+  "name": "nanshan",
+  "compatibility_date": "2026-10-01",
+  "assets": {
+    "directory": "./dist",
+    // 找不到的網址顯示自訂 404 頁面，並回傳 404 狀態碼
+    "not_found_handling": "404-page"
+  },
+  // PR 預覽（wrangler preview）需要這個區塊，可以留空，會沿用上面的設定
+  "previews": {}
+}
