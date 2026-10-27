@@ -1,0 +1,363 @@
+# Pages CMS 後台設定（https://pagescms.org）
+# 「文章」：所見即所得編輯器，適合一般文章。
+# 「文章（原始碼模式）」：直接編輯 Markdown，適合含有優缺點框、路線卡片等特殊區塊的文章
+#   （例如 g-app-2026、grindr-vs-nanshan、taiwan-pride-2026），避免編輯器把特殊區塊轉掉。
+# 兩個入口編輯的是同一批檔案。
+media:
+  input: public/img
+  output: /img
+  categories:
+  - image
+content:
+- name: posts
+  label: 文章
+  type: collection
+  path: src/content/posts
+  filename: '{primary}.md'
+  format: yaml-frontmatter
+  view:
+    primary: slug
+    fields:
+    - title
+    - category
+    - draft
+    - pubDate
+    sort: pubDate
+    order: desc
+  fields:
+  - name: title
+    label: 標題（H1）
+    type: string
+    required: true
+    description: 頁面大標題，自然放入主要關鍵字
+  - name: slug
+    label: 網址名稱
+    type: string
+    required: true
+    description: 只能用英文小寫、數字和 -，例如 blued-alternative。網址會是 /分類/網址名稱/。上線後請不要再修改
+  - name: category
+    label: 分類
+    type: select
+    required: true
+    options:
+      values:
+      - name: guide
+        label: G軟推薦
+      - name: compare
+        label: App 比較
+      - name: blog
+        label: 專欄
+  - name: seoTitle
+    label: 搜尋結果標題
+    type: string
+    description: Google 搜尋結果顯示的標題，約 30 個中文字內；不填就用上面的標題
+  - name: description
+    label: 搜尋結果摘要
+    type: text
+    required: true
+    description: 約 80 個中文字內，寫清楚這篇能解決什麼問題
+  - name: pubDate
+    label: 發布日期
+    type: date
+    required: true
+    options:
+      format: yyyy-MM-dd
+  - name: updatedDate
+    label: 更新日期
+    type: date
+    default: ''
+    description: 之後大幅更新內容時填寫
+    options:
+      format: yyyy-MM-dd
+  - name: readingTime
+    label: 閱讀時間
+    type: string
+    description: 例如：5 分鐘
+  - name: ogImage
+    label: 分享圖
+    type: image
+    description: 分享到 LINE、Facebook 時顯示的圖片，建議 1200x630
+    options:
+      extensions:
+      - jpg
+      - jpeg
+      - png
+      - webp
+  - name: disclose
+    label: 開頭說明框
+    type: text
+    description: 推薦、比較類文章建議填：「說明：本文提到南山，南山是我們自己開發的 App。」
+  - name: toc
+    label: 顯示目錄
+    type: boolean
+    default: false
+    description: 長文章建議打開
+  - name: draft
+    label: 草稿（不發布）
+    type: boolean
+    default: true
+    description: 寫好後關閉，文章才會上線
+  - name: faq
+    label: 常見問題
+    type: object
+    list:
+      collapsible:
+        collapsed: true
+        summary: '{q}'
+    description: 顯示在文章最後，也會出現在 Google 搜尋結果
+    fields:
+    - name: q
+      label: 問題
+      type: string
+    - name: a
+      label: 回答
+      type: text
+  - name: sources
+    label: 資料來源
+    type: object
+    list:
+      collapsible:
+        collapsed: true
+        summary: '{title}'
+    fields:
+    - name: title
+      label: 來源名稱
+      type: string
+    - name: url
+      label: 網址
+      type: string
+  - name: cta
+    label: 文末下載區塊
+    type: object
+    description: 不填就用預設文案
+    fields:
+    - name: title
+      label: 標題
+      type: string
+    - name: text
+      label: 說明文字
+      type: string
+  - name: event
+    label: 活動資訊（只有活動文章才填）
+    type: object
+    description: 填寫後 Google 可能顯示活動卡片；一般文章請留空
+    fields:
+    - name: name
+      label: 活動名稱
+      type: string
+    - name: description
+      label: 活動簡介
+      type: text
+    - name: startDate
+      label: 開始時間
+      type: string
+      description: 格式：2026-10-31T12:00:00+08:00
+    - name: endDate
+      label: 結束時間
+      type: string
+      description: 格式：2026-10-31T18:40:00+08:00
+    - name: locationName
+      label: 地點名稱
+      type: string
+    - name: streetAddress
+      label: 路名門牌
+      type: string
+    - name: locality
+      label: 行政區
+      type: string
+      description: 例如：信義區
+    - name: region
+      label: 縣市
+      type: string
+      description: 例如：臺北市
+    - name: organizerName
+      label: 主辦單位
+      type: string
+    - name: organizerUrl
+      label: 主辦單位網址
+      type: string
+    - name: free
+      label: 免費參加
+      type: boolean
+      default: true
+  - name: body
+    label: 正文
+    type: rich-text
+    options:
+      format: markdown
+- name: posts-source
+  label: 文章（原始碼模式）
+  type: collection
+  path: src/content/posts
+  filename: '{primary}.md'
+  format: yaml-frontmatter
+  view:
+    primary: slug
+    fields:
+    - title
+    - category
+    - draft
+    - pubDate
+    sort: pubDate
+    order: desc
+  fields:
+  - name: title
+    label: 標題（H1）
+    type: string
+    required: true
+    description: 頁面大標題，自然放入主要關鍵字
+  - name: slug
+    label: 網址名稱
+    type: string
+    required: true
+    description: 只能用英文小寫、數字和 -，例如 blued-alternative。網址會是 /分類/網址名稱/。上線後請不要再修改
+  - name: category
+    label: 分類
+    type: select
+    required: true
+    options:
+      values:
+      - name: guide
+        label: G軟推薦
+      - name: compare
+        label: App 比較
+      - name: blog
+        label: 專欄
+  - name: seoTitle
+    label: 搜尋結果標題
+    type: string
+    description: Google 搜尋結果顯示的標題，約 30 個中文字內；不填就用上面的標題
+  - name: description
+    label: 搜尋結果摘要
+    type: text
+    required: true
+    description: 約 80 個中文字內，寫清楚這篇能解決什麼問題
+  - name: pubDate
+    label: 發布日期
+    type: date
+    required: true
+    options:
+      format: yyyy-MM-dd
+  - name: updatedDate
+    label: 更新日期
+    type: date
+    default: ''
+    description: 之後大幅更新內容時填寫
+    options:
+      format: yyyy-MM-dd
+  - name: readingTime
+    label: 閱讀時間
+    type: string
+    description: 例如：5 分鐘
+  - name: ogImage
+    label: 分享圖
+    type: image
+    description: 分享到 LINE、Facebook 時顯示的圖片，建議 1200x630
+    options:
+      extensions:
+      - jpg
+      - jpeg
+      - png
+      - webp
+  - name: disclose
+    label: 開頭說明框
+    type: text
+    description: 推薦、比較類文章建議填：「說明：本文提到南山，南山是我們自己開發的 App。」
+  - name: toc
+    label: 顯示目錄
+    type: boolean
+    default: false
+    description: 長文章建議打開
+  - name: draft
+    label: 草稿（不發布）
+    type: boolean
+    default: true
+    description: 寫好後關閉，文章才會上線
+  - name: faq
+    label: 常見問題
+    type: object
+    list:
+      collapsible:
+        collapsed: true
+        summary: '{q}'
+    description: 顯示在文章最後，也會出現在 Google 搜尋結果
+    fields:
+    - name: q
+      label: 問題
+      type: string
+    - name: a
+      label: 回答
+      type: text
+  - name: sources
+    label: 資料來源
+    type: object
+    list:
+      collapsible:
+        collapsed: true
+        summary: '{title}'
+    fields:
+    - name: title
+      label: 來源名稱
+      type: string
+    - name: url
+      label: 網址
+      type: string
+  - name: cta
+    label: 文末下載區塊
+    type: object
+    description: 不填就用預設文案
+    fields:
+    - name: title
+      label: 標題
+      type: string
+    - name: text
+      label: 說明文字
+      type: string
+  - name: event
+    label: 活動資訊（只有活動文章才填）
+    type: object
+    description: 填寫後 Google 可能顯示活動卡片；一般文章請留空
+    fields:
+    - name: name
+      label: 活動名稱
+      type: string
+    - name: description
+      label: 活動簡介
+      type: text
+    - name: startDate
+      label: 開始時間
+      type: string
+      description: 格式：2026-10-31T12:00:00+08:00
+    - name: endDate
+      label: 結束時間
+      type: string
+      description: 格式：2026-10-31T18:40:00+08:00
+    - name: locationName
+      label: 地點名稱
+      type: string
+    - name: streetAddress
+      label: 路名門牌
+      type: string
+    - name: locality
+      label: 行政區
+      type: string
+      description: 例如：信義區
+    - name: region
+      label: 縣市
+      type: string
+      description: 例如：臺北市
+    - name: organizerName
+      label: 主辦單位
+      type: string
+    - name: organizerUrl
+      label: 主辦單位網址
+      type: string
+    - name: free
+      label: 免費參加
+      type: boolean
+      default: true
+  - name: body
+    label: 正文（Markdown）
+    type: code
+    options:
+      format: markdown
