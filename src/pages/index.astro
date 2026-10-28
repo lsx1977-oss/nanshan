@@ -1,7 +1,13 @@
 ---
 import Base from '../layouts/Base.astro';
 import StoreButtons from '../components/StoreButtons.astro';
-import { SITE } from '../site.config.mjs';
+import { SITE, CATEGORIES } from '../site.config.mjs';
+import { getCollection } from 'astro:content';
+
+// 首頁「最新文章」：自動顯示最新 6 篇，發新文章不用手動維護
+const latest = (await getCollection('posts', (p) => !p.data.draft))
+  .sort((a, b) => (b.data.updatedDate ?? b.data.pubDate).valueOf() - (a.data.updatedDate ?? a.data.pubDate).valueOf())
+  .slice(0, 6);
 
 const faq = [
   { q: '南山 App 免費嗎？', a: '免費下載，核心的交友、聊天與動態功能都能免費使用。' },
@@ -136,6 +142,29 @@ const jsonLd = {
             <div><span>費用</span><b>免費下載</b></div>
           </div>
         </div>
+      </div>
+    </section>
+
+    <section style="padding-top:0" aria-labelledby="latest-title">
+      <div class="wrap">
+        <h2 id="latest-title">最新文章</h2>
+        <p class="sub">交友指南、App 比較與台灣同志生活資訊，持續更新。</p>
+        <ul class="home-posts">
+          {latest.map((p) => (
+            <li>
+              <a href={`/${p.data.category}/${p.id}/`}>
+                <span class="home-post-cat">{CATEGORIES[p.data.category].name}</span>
+                <h3>{p.data.title}</h3>
+                <p>{p.data.description}</p>
+              </a>
+            </li>
+          ))}
+        </ul>
+        <nav class="home-cats" aria-label="文章分類">
+          {Object.entries(CATEGORIES).map(([key, c]) => (
+            <a href={`/${key}/`}>看全部「{c.name}」→</a>
+          ))}
+        </nav>
       </div>
     </section>
 
